@@ -1,128 +1,121 @@
-# Cold Email Copy Grader
+# Cold Outbound Skills
 
-A Claude Code skill that grades your cold email campaigns on a 0-100 scale. Based on patterns from 1,000+ real B2B cold email campaigns.
+Open-source [Claude Code skills](https://docs.claude.com/en/docs/claude-code/skills) for cold email and outbound sales. Built by [GrowthEngineX](https://growthengine-x.com) from patterns across 1,000+ real B2B campaigns.
 
-Paste your draft email sequences and targeting details. Get back a score, risk flags, benchmark comparisons, and full copywriting rewrites when your copy needs work.
+Each skill is a self-contained folder with a `SKILL.md` file that teaches Claude how to complete a specific outbound task. No API keys are included — bring your own accounts and credentials.
 
-No API keys, no database, no external tools. Everything runs from the patterns baked into the skill.
+## Skills
 
-## What You Get
+| Skill | What It Does | Accounts Needed |
+|-------|-------------|-----------------|
+| [Cold Email Copy Grader](./skills/cold-email-copy-grader/) | Grade campaigns 0-100, get risk flags and rewrites | None |
+| [Prospeo Full Export](./skills/prospeo-full-export/) | Export entire Prospeo searches to CSV (even 25K+) | [Prospeo](https://prospeo.io) |
+| [Google Maps Scraper](./skills/google-maps-scraper/) | Scrape business listings by query + location, export to CSV | [RapidAPI](https://rapidapi.com/alexanderxbx/api/maps-data) |
 
-- **Score (0-100)** broken down by copywriting quality, targeting, and personalization
-- **Risk flags** that catch the mistakes most likely to tank your campaign
-- **Benchmark comparison** against top-performing campaigns
-- **Full rewrites** when your score is below 65 — subject lines, body copy, and follow-up sequences
-- **Quick grade mode** for a fast gut check (letter grade + 3 bullets)
+---
 
-## The Most Important Finding
+### Cold Email Copy Grader
 
-Generic AI personalization — where AI describes what the prospect's company does — has a **71% poor rate**. It performs **4x worse than no personalization at all**.
+Grade your cold email campaigns on a 0-100 scale. Paste your draft sequences and targeting details, get back a score, risk flags, benchmark comparisons, and full copywriting rewrites when your copy needs work.
 
-Meanwhile, targeted product-focused AI — where AI calculates your value for them — has a **63.9% top-performer rate**.
+- Score breakdown by copywriting quality, targeting, and personalization
+- Risk assessment catching 15 anti-patterns (spam triggers, bump-only follow-ups, weak CTAs)
+- Benchmark comparison against top-performing campaigns
+- Full rewrites when your score is below 65
+- Quick grade mode for a fast gut check
 
-The difference:
-- Bad: "I noticed {{company_name}} helps customers with [AI-generated description]..."
-- Good: "{{company_name}} could save {{savings}} annually by switching to [our approach]..."
+**No external accounts needed.** Everything runs from the patterns baked into the skill.
 
-This single insight is worth more than most cold email courses.
+**Key finding:** Generic AI personalization — where AI describes what the prospect's company does — has a 71% poor rate. It performs 4x worse than no personalization at all.
+
+See the [worked example](./skills/cold-email-copy-grader/examples/before-and-after.md) showing a campaign go from 38 to 66.
+
+---
+
+### Prospeo Full Export
+
+Export your entire [Prospeo](https://prospeo.io) people search to CSV. Build your search in Prospeo's UI, then let Claude pull every single result via the API — even searches over 25,000 results.
+
+- Translates your Prospeo UI filters into API calls automatically
+- Paginates through every page and exports to CSV
+- Handles rate limiting and retry logic
+- Deduplicates contacts by LinkedIn URL
+- Automatically splits US-wide searches by state to bypass the 25K result cap
+
+**Requires:** A [Prospeo](https://prospeo.io) account with API credits. The skill walks you through signup and API key setup.
+
+---
+
+### Google Maps Scraper
+
+Scrape Google Maps for business listings by search query and location. Give it "pizza restaurant" and a state, city, or list of zip codes — get back structured data (name, address, phone, website, rating, reviews, coordinates) as a CSV.
+
+- Searches by query + zip code, city, or entire US state
+- Bundled with 42,734 US zip codes (filter by state, city, or population)
+- Rate limiting (2 req/sec) with automatic retries
+- Deduplicates results across overlapping zip code searches
+- Run as a local CLI or deploy as a web app
+- Export to CSV
+
+**Requires:** A [RapidAPI](https://rapidapi.com) account with a subscription to the [Maps Data API](https://rapidapi.com/alexanderxbx/api/maps-data) (free tier available).
+
+```bash
+# Scrape all pizza places in Texas (populated zips only)
+npm run scrape -- --query="pizza restaurant" --state=TX --min-pop=5000
+
+# Scrape dentists in specific NYC zip codes
+npm run scrape -- --query="dentist" --zips=10014,10013,10012
+```
+
+---
 
 ## Installation
 
-### Claude Code (CLI)
+### Claude Code (Recommended)
 
-Copy the skill to your Claude Code skills directory:
+Copy any skill folder into your Claude Code skills directory:
 
 ```bash
-# Create the skills directory if it doesn't exist
-mkdir -p ~/.claude/skills/cold-email-copy-grader
+# Clone the repo
+git clone https://github.com/growthenginenowoslawski/coldoutboundskills.git
 
-# Copy the skill files
-cp SKILL.md ~/.claude/skills/cold-email-copy-grader/
-cp -r examples ~/.claude/skills/cold-email-copy-grader/
+# Copy the skills you want
+cp -r coldoutboundskills/skills/cold-email-copy-grader ~/.claude/skills/
+cp -r coldoutboundskills/skills/prospeo-full-export ~/.claude/skills/
+cp -r coldoutboundskills/skills/google-maps-scraper ~/.claude/skills/
 ```
 
-Then use it in Claude Code:
-
-```
-/cold-email-copy-grader
-```
-
-Or just paste your email copy and say "grade this cold email."
+Then just mention the task in Claude Code:
+- "Grade this cold email" (triggers the copy grader)
+- "Export my Prospeo search to CSV" (triggers the Prospeo exporter)
+- "Scrape Google Maps for dentists in Texas" (triggers the maps scraper)
 
 ### Manual Use (Any LLM)
 
-You can also use `SKILL.md` as a system prompt or context document with any LLM. The scoring methodology, benchmarks, and rewrite guidelines work independently of Claude Code. Copy the contents of `SKILL.md` into your system prompt and paste your campaign copy.
+Each `SKILL.md` file works as a standalone system prompt. Copy the contents into any LLM's system prompt or context window and it will follow the instructions.
 
-## Usage
+## How Skills Work
 
-### Full Grade
-
-Provide your email sequences, targeting info, and merge variables:
-
-```
-Grade this campaign:
-
-Target: CEOs at restaurants, 1-50 employees, US
-
-Sequence 1:
-Subject: quick question about {{company_name}}?
-Body: {{first_name}}, saw {{company_name}} has a {{rating}}-star rating on Google...
-[rest of email]
-
-Sequence 2:
-[follow-up]
-```
-
-You'll get a full report with score breakdown, risk flags, benchmarks, and rewrites if needed.
-
-### Quick Grade
-
-For a fast gut check:
+A skill is just a folder containing a `SKILL.md` file with:
+- **YAML frontmatter** (`name` and `description`) so Claude knows when to use it
+- **Markdown instructions** that Claude follows when the skill is active
 
 ```
-Quick check on this email:
-
-Subject: Partnership opportunity
-Body: Hi {{first_name}}, I wanted to reach out about...
+skills/
+  my-skill/
+    SKILL.md          # Instructions and metadata
+    examples/         # Optional: worked examples
 ```
 
-Returns a letter grade, 3 bullet points, and one recommendation.
+For more on creating skills, see Anthropic's [skill creation guide](https://support.claude.com/en/articles/12512198-creating-custom-skills).
 
-## Example
+## Contributing
 
-See [examples/before-and-after.md](examples/before-and-after.md) for a full worked example showing a mediocre campaign (score: 38) getting rewritten to above average (score: 66).
+Have a cold outbound workflow that could be a skill? Open a PR. Each skill should be:
 
-**Before**: Generic subject, passive CTA, bump-only follow-up, 2 sequences
-**After**: Question subject, observation opener, value-add follow-ups, 4 sequences with breakup email
-
-## What's Inside
-
-The scoring is based on three weighted components:
-
-| Factor | Weight | What It Measures |
-|--------|--------|-----------------|
-| Copywriting | 40% | Subject line patterns, body structure, CTAs, sequence flow |
-| Targeting | 35% | Decision-maker concentration, industry focus, audience-copy alignment |
-| Variables | 25% | Personalization type and quality (the generic AI trap lives here) |
-
-Plus a risk assessment system that catches 15 anti-patterns, from spam triggers to the "AI Personalization Trap."
-
-## Key Benchmarks
-
-| What | Top Performers | Average | Poor |
-|------|---------------|---------|------|
-| Subject line | Question format, <42 chars | Standard, 47 chars | Generic, 54+ chars |
-| Body length | ~73 words | ~71 words | ~70 words (length isn't the issue) |
-| Sequences | 4-5 | 3 | 1-2 |
-| Opener | Observation (14%) | Question (11%) | Generic greeting (4%) |
-| CTA | Question (13%) | Soft ask (11%) | Passive (6%) |
-| Follow-ups | Value-add (13%) | Mixed | Bump-only (5%) |
-
-## Where This Data Comes From
-
-These patterns were extracted from analysis of 1,000+ real B2B cold email campaigns across restaurants, healthcare, real estate, professional services, technology, manufacturing, finance, and other industries. The campaigns ranged from excellent (top 10%) to poor, providing clear signal on what separates winners from losers.
-
-The analysis covered subject line patterns, body structure, personalization strategies, sequence design, targeting approaches, and — most importantly — the impact of different types of AI personalization on campaign performance.
+- **Self-contained** — no dependencies on other skills or internal tooling
+- **API-key-free** — never hardcode credentials; use environment variables
+- **Beginner-friendly** — include setup instructions for someone who's never used the platform
 
 ## License
 
