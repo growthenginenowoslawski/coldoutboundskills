@@ -142,4 +142,4 @@ MIT License. See [LICENSE](LICENSE).
 
 ## Credits
 
-Built by [GrowthEngineX](https://growthengine-x.com). Data from real campaigns run across dozens of industries.
+Built by [GrowthEngineX](https://coldoutbound.com). Data from real campaigns run across dozens of industries.
