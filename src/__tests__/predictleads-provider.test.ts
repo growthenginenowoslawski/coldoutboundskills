@@ -22,6 +22,8 @@ import assert from "node:assert/strict";
 import {
   PredictLeadsSignalProvider,
   PredictLeadsApiError,
+  classifyJobPosting,
+  type JobClass,
 } from "../providers/signals/predictleads-provider";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -769,4 +771,210 @@ test("PredictLeadsApiError: status and body exposed on instance", () => {
   assert.equal(err.body, "not found");
   assert.ok(err.message.includes("404"));
   assert.ok(err instanceof Error);
+});
+
+test("PredictLeadsApiError: responseHeaders defaults to empty object when omitted", () => {
+  const err = new PredictLeadsApiError(402, "Payment Required");
+  assert.deepEqual(err.responseHeaders, {});
+});
+
+test("PredictLeadsApiError: responseHeaders stored on instance when provided", () => {
+  const headers = { "x-error-code": "plan_restriction", "content-type": "application/json" };
+  const err = new PredictLeadsApiError(402, "Payment Required", headers);
+  assert.deepEqual(err.responseHeaders, headers);
+});
+
+test("HTTP 402 → body fragment captured in per-company error message", async () => {
+  setKeys("key", "tok");
+  const restore = mockFetchQueue([
+    { status: 402, body: { error: "plan_restriction", message: "Upgrade required" } },
+    { status: 200, body: { data: [] } },
+  ]);
+  try {
+    const p = new PredictLeadsSignalProvider();
+    const { meta } = await p.fetchEvents(
+      [COMPANY_ID],
+      CLIENT_ID,
+      { companyDomains: new Map([[COMPANY_ID, DOMAIN]]) },
+    );
+    const m = meta as { perCompanyErrors?: Record<string, string> };
+    assert.ok(m.perCompanyErrors?.[COMPANY_ID], "error should be captured per-company");
+    assert.ok(m.perCompanyErrors[COMPANY_ID].includes("402"), "error message should include status 402");
+  } finally {
+    restore();
+  }
+});
+
+// ── classifyJobPosting ────────────────────────────────────────────────────────
+
+// Silence the unused-type import — JobClass is checked via satisfies in tests below.
+const _jobClassCheck: JobClass = "general";
+void _jobClassCheck;
+
+test("classifyJobPosting: C-Suite seniority → senior_leadership", () => {
+  assert.equal(classifyJobPosting("Head of Something", null, "C-Suite"), "senior_leadership");
+});
+
+test("classifyJobPosting: 'Managing Director' in title → senior_leadership", () => {
+  assert.equal(classifyJobPosting("Managing Director", null, null), "senior_leadership");
+});
+
+test("classifyJobPosting: 'CEO' abbreviation in title → senior_leadership", () => {
+  assert.equal(classifyJobPosting("CEO", null, null), "senior_leadership");
+});
+
+test("classifyJobPosting: 'MD' abbreviation in title → senior_leadership", () => {
+  assert.equal(classifyJobPosting("MD", null, null), "senior_leadership");
+});
+
+test("classifyJobPosting: 'Founder' keyword in title → senior_leadership", () => {
+  assert.equal(classifyJobPosting("Co-Founder and Head of Growth", null, null), "senior_leadership");
+});
+
+test("classifyJobPosting: 'Chief Financial Officer' in title → senior_leadership", () => {
+  assert.equal(classifyJobPosting("Chief Financial Officer", null, null), "senior_leadership");
+});
+
+test("classifyJobPosting: 'Sales' category → bd_commercial", () => {
+  assert.equal(classifyJobPosting("Sales Representative", "Sales", null), "bd_commercial");
+});
+
+test("classifyJobPosting: 'Sales Director' in title → bd_commercial", () => {
+  assert.equal(classifyJobPosting("Sales Director", null, null), "bd_commercial");
+});
+
+test("classifyJobPosting: 'Head of Sales' in title → bd_commercial", () => {
+  assert.equal(classifyJobPosting("Head of Sales", null, null), "bd_commercial");
+});
+
+test("classifyJobPosting: 'Head of Business Development' in title → bd_commercial", () => {
+  assert.equal(classifyJobPosting("Head of Business Development", null, null), "bd_commercial");
+});
+
+test("classifyJobPosting: 'Account Director' in title → bd_commercial", () => {
+  assert.equal(classifyJobPosting("Account Director", null, null), "bd_commercial");
+});
+
+test("classifyJobPosting: BDM abbreviation in title → bd_commercial", () => {
+  assert.equal(classifyJobPosting("BDM", null, null), "bd_commercial");
+});
+
+test("classifyJobPosting: 'Marketing' category → marketing_creative", () => {
+  assert.equal(classifyJobPosting("Brand Manager", "Marketing", null), "marketing_creative");
+});
+
+test("classifyJobPosting: 'Creative Director' in title → marketing_creative", () => {
+  assert.equal(classifyJobPosting("Creative Director", null, null), "marketing_creative");
+});
+
+test("classifyJobPosting: 'Marketing Director' in title → marketing_creative", () => {
+  assert.equal(classifyJobPosting("Marketing Director", null, null), "marketing_creative");
+});
+
+test("classifyJobPosting: 'Engineering' category → tech_digital", () => {
+  assert.equal(classifyJobPosting("Software Engineer", "Engineering", "Senior"), "tech_digital");
+});
+
+test("classifyJobPosting: 'Head of Digital' in title → tech_digital", () => {
+  assert.equal(classifyJobPosting("Head of Digital", null, null), "tech_digital");
+});
+
+test("classifyJobPosting: CTO abbreviation in title → tech_digital", () => {
+  assert.equal(classifyJobPosting("CTO", null, null), "tech_digital");
+});
+
+test("classifyJobPosting: 'Human Resources' category → talent_people", () => {
+  assert.equal(classifyJobPosting("HR Manager", "Human Resources", null), "talent_people");
+});
+
+test("classifyJobPosting: 'Head of People' in title → talent_people", () => {
+  assert.equal(classifyJobPosting("Head of People", null, null), "talent_people");
+});
+
+test("classifyJobPosting: 'Operations' category → operations_delivery", () => {
+  assert.equal(classifyJobPosting("Operations Manager", "Operations", null), "operations_delivery");
+});
+
+test("classifyJobPosting: 'Head of Production' in title → operations_delivery", () => {
+  assert.equal(classifyJobPosting("Head of Production", null, null), "operations_delivery");
+});
+
+test("classifyJobPosting: unrecognized title with no category → general", () => {
+  assert.equal(classifyJobPosting("Graphic Designer", null, null), "general");
+});
+
+test("classifyJobPosting: all nulls → general", () => {
+  assert.equal(classifyJobPosting(null, null, null), "general");
+});
+
+test("classifyJobPosting: senior_leadership takes priority over Sales category", () => {
+  assert.equal(classifyJobPosting("Founder", "Sales", null), "senior_leadership");
+});
+
+test("classifyJobPosting: case-insensitive — UPPERCASE title matches senior_leadership", () => {
+  assert.equal(classifyJobPosting("MANAGING DIRECTOR", null, null), "senior_leadership");
+});
+
+test("classifyJobPosting: case-insensitive — mixed-case C-Suite seniority", () => {
+  assert.equal(classifyJobPosting("Head of Growth", null, "c-suite"), "senior_leadership");
+});
+
+// ── mapJobOpening: job_class evidence field ───────────────────────────────────
+
+test("mapJobOpening: evidence always includes job_class field", async () => {
+  setKeys("key", "tok");
+  const restore = mockSingleCompany([makeJobRecord()], []);
+  try {
+    const p = new PredictLeadsSignalProvider();
+    const { events } = await p.fetchEvents(
+      [COMPANY_ID],
+      CLIENT_ID,
+      { companyDomains: new Map([[COMPANY_ID, DOMAIN]]) },
+    );
+    const evidence = events[0].rawEvent.evidence as Record<string, unknown>;
+    assert.ok("job_class" in evidence, "evidence must include job_class");
+    assert.equal(typeof evidence.job_class, "string");
+  } finally {
+    restore();
+  }
+});
+
+test("mapJobOpening: job_class = bd_commercial for 'Head of Business Development'", async () => {
+  setKeys("key", "tok");
+  const restore = mockSingleCompany(
+    [makeJobRecord({ title: "Head of Business Development", category: undefined, seniority: undefined })],
+    [],
+  );
+  try {
+    const p = new PredictLeadsSignalProvider();
+    const { events } = await p.fetchEvents(
+      [COMPANY_ID],
+      CLIENT_ID,
+      { companyDomains: new Map([[COMPANY_ID, DOMAIN]]) },
+    );
+    const evidence = events[0].rawEvent.evidence as Record<string, unknown>;
+    assert.equal(evidence.job_class, "bd_commercial");
+  } finally {
+    restore();
+  }
+});
+
+test("mapJobOpening: job_class = general for unrecognized title with no category", async () => {
+  setKeys("key", "tok");
+  const restore = mockSingleCompany(
+    [makeJobRecord({ title: "Receptionist", category: undefined, seniority: undefined })],
+    [],
+  );
+  try {
+    const p = new PredictLeadsSignalProvider();
+    const { events } = await p.fetchEvents(
+      [COMPANY_ID],
+      CLIENT_ID,
+      { companyDomains: new Map([[COMPANY_ID, DOMAIN]]) },
+    );
+    const evidence = events[0].rawEvent.evidence as Record<string, unknown>;
+    assert.equal(evidence.job_class, "general");
+  } finally {
+    restore();
+  }
 });

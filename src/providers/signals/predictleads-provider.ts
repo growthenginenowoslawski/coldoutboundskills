@@ -268,13 +268,13 @@ export class PredictLeadsSignalProvider implements SignalProvider {
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
       if (!retry.ok) {
-        throw new PredictLeadsApiError(retry.status, await safeBodyText(retry));
+        throw new PredictLeadsApiError(retry.status, await safeBodyText(retry), extractHeaders(retry.headers));
       }
       return retry;
     }
 
     if (!resp.ok) {
-      throw new PredictLeadsApiError(resp.status, await safeBodyText(resp));
+      throw new PredictLeadsApiError(resp.status, await safeBodyText(resp), extractHeaders(resp.headers));
     }
 
     return resp;
@@ -287,10 +287,91 @@ export class PredictLeadsApiError extends Error {
   constructor(
     public readonly status: number,
     public readonly body: string,
+    public readonly responseHeaders: Record<string, string> = {},
   ) {
-    super(`PredictLeads API error ${status}: ${body.slice(0, 200)}`);
+    super(`PredictLeads API error ${status}: ${body.slice(0, 400)}`);
     this.name = "PredictLeadsApiError";
   }
+}
+
+// ── Job posting classification ────────────────────────────────────────────────
+
+export type JobClass =
+  | "bd_commercial"
+  | "senior_leadership"
+  | "marketing_creative"
+  | "tech_digital"
+  | "talent_people"
+  | "operations_delivery"
+  | "general";
+
+/**
+ * Deterministic job-posting classifier for UK agency ICP signals.
+ *
+ * Priority order reflects ICP signal value for UK creative/agency targets:
+ *   senior_leadership → bd_commercial → marketing_creative
+ *   → tech_digital → talent_people → operations_delivery → general
+ *
+ * Pure function — no network calls, no DB reads, no side effects.
+ * First-match wins; category takes precedence only when no title keyword fires.
+ */
+export function classifyJobPosting(
+  title: string | null,
+  category: string | null,
+  seniority: string | null,
+): JobClass {
+  const t = (title ?? "").toLowerCase();
+  const cat = (category ?? "").toLowerCase();
+  const sen = (seniority ?? "").toLowerCase();
+
+  if (
+    sen === "c-suite" ||
+    /\b(managing director|chief executive officer|chief operating officer|chief financial officer|co-founder|founder|managing partner)\b/.test(t) ||
+    /\bceo\b|\bcoo\b|\bcfo\b|\bmd\b/.test(t)
+  ) {
+    return "senior_leadership";
+  }
+
+  if (
+    cat === "sales" ||
+    /\b(business development director|commercial director|sales director|head of sales|head of business development|business development manager|account director|client services director|new business director)\b/.test(t) ||
+    /\bbdm\b/.test(t)
+  ) {
+    return "bd_commercial";
+  }
+
+  if (
+    cat === "marketing" ||
+    /\b(creative director|executive creative director|head of creative|brand director|marketing director|chief creative officer|head of brand|chief marketing officer)\b/.test(t) ||
+    /\bcmo\b/.test(t)
+  ) {
+    return "marketing_creative";
+  }
+
+  if (
+    cat === "engineering" ||
+    cat === "technology" ||
+    /\b(technology director|head of digital|digital director|chief technology officer|head of technology)\b/.test(t) ||
+    /\bcto\b/.test(t)
+  ) {
+    return "tech_digital";
+  }
+
+  if (
+    cat === "human resources" ||
+    /\b(people director|head of people|hr director|talent director|chief people officer|head of hr)\b/.test(t)
+  ) {
+    return "talent_people";
+  }
+
+  if (
+    cat === "operations" ||
+    /\b(head of production|studio director|operations director|project director|delivery director|studio manager|head of operations)\b/.test(t)
+  ) {
+    return "operations_delivery";
+  }
+
+  return "general";
 }
 
 // ── Job opening mapper ────────────────────────────────────────────────────────
@@ -334,6 +415,7 @@ function mapJobOpening(
   };
   if (category) evidence.category = category;
   if (seniority) evidence.seniority = seniority;
+  evidence.job_class = classifyJobPosting(title, category, seniority);
 
   const signalTitle = seniority
     ? `Hiring: ${seniority} ${title}`
@@ -498,4 +580,10 @@ async function safeBodyText(resp: Response): Promise<string> {
   } catch {
     return "<unreadable>";
   }
+}
+
+function extractHeaders(headers: Headers): Record<string, string> {
+  const result: Record<string, string> = {};
+  headers.forEach((value, key) => { result[key] = value; });
+  return result;
 }

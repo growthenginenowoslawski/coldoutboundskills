@@ -628,6 +628,57 @@ Full findings documented in `docs/supabase/19-CAMPAIGN-LEADS.md` § 15.
 
 ---
 
+## Migration 0021 — account_campaign_qualification (Stage 29 Phase 2)
+
+**File:** `0021_account_campaign_qualification.sql`
+**Applied:** 2026-09-11 via Supabase Management API
+**SHA256:** `83ba74d82ae42f8a049dd2bc0607fd69d41b640de144aff3c1a8765a47808930`
+
+**What changed:** Created one new table for campaign-specific account qualification. `account_intelligence` was NOT modified.
+
+**New table:**
+
+| Table | Key | Purpose |
+|-------|-----|---------|
+| `account_campaign_qualification` | UNIQUE(client_id, company_id, campaign_strategy_id) | Campaign-specific qualification verdict for a company against a specific ICP |
+
+**Key design decisions:**
+
+- **account_intelligence is NOT modified.** The original migration 0021 proposal (adding `qualification`, `is_qualified`, `qualification_assessed_at` to `account_intelligence`) was rejected by the Phase 1.5 architecture review. Adding campaign-specific data to a per-(client, company) table would cause the last qualification run to silently overwrite all previous campaigns' qualifications for the same company.
+
+- **Follows the `contact_campaign_relevance` pattern exactly (migration 0018).** "The same company may QUALIFY for one campaign and NOT QUALIFY for another" — identical reasoning to "The same contact may be RELEVANT for one campaign and NOT RELEVANT for another."
+
+- **UNIQUE(client_id, company_id, campaign_strategy_id)** — the idempotent upsert key. Re-running qualification for the same (client, company, strategy) triple updates in place.
+
+- **qualification_score CHECK(0–100)** — enforces valid range at the DB level.
+
+- **Client-isolation trigger** `account_qualification_strategy_client_check` — same pattern as migration 0018 trigger (`check_contact_campaign_strategy_client`). Fires BEFORE INSERT OR UPDATE. Raises an exception if `campaign_strategy_id` does not belong to the same `client_id`.
+
+- **RLS enabled, zero policies** — consistent with all other tables. Access via service_role only.
+
+- **Indexes:** `(client_id, campaign_strategy_id)` for Stage 25 campaign queries; `(client_id, campaign_strategy_id) WHERE qualified=true` partial index for qualified-companies filter; `(company_id)` and `(client_id, company_id)` for reverse lookups.
+
+- **All thresholds INITIAL_HYPOTHESIS_NOT_VALIDATED** — `qualification_score` weights and the `qualified` gate threshold are starting hypotheses, not validated against campaign outcome data.
+
+**Migration 0020 note:** Migration 0020 (`campaign_readiness_assessments` + `campaign_readiness_approvals`) was applied as part of Stage 25A (2026-09-09) and is documented here for completeness. The migration numbering jumped from 0019 → 0021 because 0020 was applied before the qualification table design was finalised.
+
+**Verification script:** `scripts/apply-0021-migration.ts` — 103/103 checks, 0 failures.
+
+**Functional tests passed:**
+- Test A: Idempotent upsert — same (client, company, strategy) → no duplicate row
+- Test B: Same (client, company), two strategies → both coexist with correct independent values
+- Test C: CHECK constraint rejects `qualification_score` = -1 and 101
+- Test D: Client-isolation trigger rejects a strategy belonging to a different (or non-existent) client
+- Test E: UNIQUE key prevents Strategy A from overwriting Strategy B
+
+**Delta:**
+- `account_campaign_qualification` rows: 0 → 0 (test rows inserted and cleaned up)
+- All unrelated tables: unchanged (15 ai rows, 1 campaign, 3239 signals, 243 companies, 215 contacts, 3 strategies, 3 ccr rows, 3 ci rows)
+- Provider calls: 0
+- Outreach: 0
+
+---
+
 ## Schema Evolution Summary
 
 | Migration | Key Addition | Enables |
@@ -654,3 +705,5 @@ Full findings documented in `docs/supabase/19-CAMPAIGN-LEADS.md` § 15.
 | Stage 21B (no migration) | Controlled first-send experiment — BEFORE/AFTER snapshots | Confirmed: `roster.sent_at` always null; `global_lead.last_sent_at` is authoritative; status STARTED→COMPLETED |
 | 0018 | `contact_intelligence` + `contact_campaign_relevance` tables + cross-client trigger | Stage 23: title classification + contact eligibility gate snapshot + campaign-specific relevance scoring |
 | 0019 | `person_discovery_runs` + `person_discovery_attempts` + `email_enrichment_runs` + `email_enrichment_attempts` | Stage 24: person discovery + email enrichment waterfall audit trail; found_email never stored |
+| 0020 | `campaign_readiness_assessments` + `campaign_readiness_approvals` tables | Stage 25: deterministic OUTREACH_READY/HARD_BLOCKED verdict + human approval gate before outreach |
+| 0021 | `account_campaign_qualification` table + cross-client trigger | Stage 29: campaign-specific account qualification; UNIQUE(client,company,strategy); account_intelligence NOT modified |
