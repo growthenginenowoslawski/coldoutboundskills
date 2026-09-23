@@ -19,3 +19,5 @@ dist/
 health-*.csv
 scorecard-*.md
 campaign-plan-*.md
+__pycache__/
+*.pyc

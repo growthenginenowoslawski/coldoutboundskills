@@ -16,7 +16,7 @@ build harnesses.
 |---|---|---|
 | `SKILL.md` | the playbook: source chain, output contract, locked prompt, edge cases | running the signal from Claude on a list |
 | `clay-table.md` | the Clay **table** build: columns, formulas, credit gates | the signal runs continuously on a client table |
-| `clay-workflow.md` | the Clay **workflow** build via the `clay` CLI | you want it version-controlled and buildable from a terminal |
+| `clay-workflow.md` | a pointer to the **tested Clay CLI skill** in [`../clay-cli-playbooks/`](../clay-cli-playbooks/) | you want it to run on Clay alone, from a terminal |
 
 **Why tables are browser-driven and workflows are CLI-driven.** This is a real constraint, not a
 style choice. The `clay` CLI's `tables` command group is read-only — it cannot create a table or add
@@ -28,10 +28,13 @@ a column, so tables are built in the UI. Workflows are the opposite: `clay workf
 Each `SKILL.md` carries a verification line saying what was actually run and on how many rows. Where
 it says PASS, real rows were graded.
 
-⚠️ **The `clay-table.md` and `clay-workflow.md` files have not been built and run in a live Clay
-workspace.** They are written against the real Clay action catalog and the real CLI command surface,
-so the shapes are right, but treat them as specifications. Build one, run it on 5 rows, read the
-output, and fix the file.
+⚠️ **The `clay-table.md` files have not been built in a live Clay workspace.** They are written
+against the real Clay action catalog, so the shapes are right, but treat them as specifications.
+Build one, run it on 5 rows, read the output, and fix the file.
+
+✅ **The Clay CLI versions were run live.** Every `clay-workflow.md` now points to a skill in
+[`../clay-cli-playbooks/`](../clay-cli-playbooks/) that was built and run in a real Clay workspace on
+2026-09-23 and passes Clay's marketplace validator. Its README has the status of each one.
 
 ## The 19
 

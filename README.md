@@ -8,7 +8,7 @@ Open-source [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/
 
 ## What's in here
 
-30 skills organized in 5 tracks, plus 19 signal playbooks in Track 6 — each shipping three ways (a Claude skill, a Clay table build, and a Clay CLI workflow).
+30 skills organized in 5 tracks, plus 19 signal playbooks in Track 6 — each shipping three ways (a Claude skill, a Clay table build, and a Clay CLI skill that was tested live).
 
 **New to cold email? Start with `/cold-email-kickoff`.** It orchestrates ICP → lead magnet → campaign strategy → plan in one guided flow.
 
@@ -65,10 +65,13 @@ Every playbook ships the same three files:
 |---|---|
 | `SKILL.md` | the playbook: source chain, output contract, locked prompt, edge cases |
 | `clay-table.md` | the Clay **table** build — columns, formulas, credit gates (browser-driven) |
-| `clay-workflow.md` | the Clay **workflow** build via the `clay` CLI (terminal-driven) |
+| `clay-workflow.md` | a pointer to the **tested Clay CLI skill** for this signal in [`skills/clay-cli-playbooks/`](skills/clay-cli-playbooks/) |
 
-*Tables are browser-driven and workflows are CLI-driven because of a real constraint: the `clay` CLI
-is read-only for tables, but can create, edit and publish workflows.*
+**New: all 19 run on the Clay CLI alone, tested live.** [`skills/clay-cli-playbooks/`](skills/clay-cli-playbooks/)
+has each playbook rebuilt to run on nothing but Clay: Clay supplies the data, your agent writes the
+copy, and no other API keys are needed. All 19 were run live in a real Clay workspace on 2026-09-23
+(13 end to end; 6 with one paid step priced but not run) and all 19 pass Clay's marketplace
+validator. The status table is in that folder's README.
 
 - **Person signals** — `new-in-role` · `linkedin-engagement` · `social-posts` · `warm-intros`
 - **Company signals** — `fundraising` · `hiring-surge` · `job-posting-language` · `ad-library`
@@ -77,9 +80,9 @@ is read-only for tables, but can create, edit and publish workflows.*
 - **Copy generation** — `ai-specificity` · `creative-ideas`
 
 ⚠️ Each `SKILL.md` carries a verification line saying what was actually run and on how many rows. The
-`clay-table.md` and `clay-workflow.md` files are documented recipes that **have not been built and run
-in a live Clay workspace** — written against the real Clay action catalog and CLI surface, but treat
-them as specifications: build one, run 5 rows, read the output, fix the file.
+`clay-table.md` files are documented recipes that **have not been built in a live Clay workspace**;
+treat them as specifications: build one, run 5 rows, read the output, fix the file. The Clay CLI
+versions in `skills/clay-cli-playbooks/` *were* run live, and each one lists what it did not run.
 
 ## Getting started
 

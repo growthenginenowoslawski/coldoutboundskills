@@ -1,6 +1,6 @@
 ---
 name: clay-playbooks
-description: Index and shared harness for the 19 signal playbooks. Each playbook turns one buying signal (new in role, raised a round, hiring surge, pricing page, tech on website, ...) into one copy-ready sentence you can drop into a cold email. Every playbook ships three ways to run it: as a Claude skill, as a Clay table built through a browser harness, and as a Clay workflow built from the clay CLI. Use when someone says "personalize this list", "what signal should I use", "build the Clay column for X", or names any of the 19 signals.
+description: Index and shared harness for the 19 signal playbooks. Each playbook turns one buying signal (new in role, raised a round, hiring surge, pricing page, tech on website, ...) into one copy-ready sentence you can drop into a cold email. Every playbook ships three ways to run it: as a Claude skill, as a Clay table built through a browser harness, and as a tested skill that runs on the Clay CLI alone (skills/clay-cli-playbooks/). Use when someone says "personalize this list", "what signal should I use", "build the Clay column for X", or names any of the 19 signals.
 ---
 
 # Clay Playbooks
@@ -21,7 +21,7 @@ same recipe, not three different recipes.
 |---|---|---|
 | `SKILL.md` | The playbook itself: source chain, output contract, locked prompt, edge cases | You are running the signal from Claude, ad hoc, on a CSV or a one-off list |
 | `clay-table.md` | The Clay **table** build: exact columns, types, formulas, credit gates, AI-column bindings | The signal needs to run continuously on a client table that other people will look at |
-| `clay-workflow.md` | The Clay **workflow** build via the `clay` CLI: node graph, real action keys, publish and run | You want the signal version-controlled and buildable from a terminal, no UI clicking |
+| `clay-workflow.md` | A pointer to the **tested Clay CLI skill** for this signal in `skills/clay-cli-playbooks/` | You want the signal to run on Clay alone, from a terminal, with no UI clicking |
 
 **Why tables are browser-driven and workflows are CLI-driven.** This is a real constraint, not a
 style choice. The `clay` CLI's `tables` command group is read-only (`list`, `get`, `columns`,
@@ -44,11 +44,15 @@ for what is specific to that signal.
 The `SKILL.md` in each directory carries a verification line saying what was actually run and on
 how many rows. Where it says PASS, real rows were graded.
 
-**The `clay-table.md` and `clay-workflow.md` files in every playbook are documented recipes that
-have not been built and run in a live Clay workspace.** They are written against the real Clay
-action catalog and the real CLI command surface, so the shapes are right, but nobody has clicked
-through the table build or published the workflow. Treat them as specifications. Build one, run it
-on 5 rows, read the output, and fix the file before you run it on a list.
+**The `clay-table.md` files in every playbook are documented recipes that have not been built in
+a live Clay workspace.** They are written against the real Clay action catalog, so the shapes are
+right, but nobody has clicked through the table build. Treat them as specifications. Build one, run
+it on 5 rows, read the output, and fix the file before you run it on a list.
+
+**The Clay CLI versions were run live.** Each playbook's `clay-workflow.md` points to a skill in
+`skills/clay-cli-playbooks/` that was built and run in a real Clay workspace on 2026-09-23 (CLI
+1.3.0). 13 ran end to end; 6 ran their free path, with one paid step each priced but not run. Prefer
+those over `clay-cli-harness.md`, which is the older untested procedure.
 
 The one thing most likely to be wrong on first build is the AI column's reasoning-effort
 parameter. See `clay-table-harness.md` § "The empty-column trap".
