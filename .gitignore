@@ -10,7 +10,8 @@ dist/
 
 # Local-only tools
 .enzyme/
-.claude/
+.claude/*
+!.claude/skills
 .obsidian/
 .cursor/
 
