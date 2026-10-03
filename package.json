@@ -1,0 +1,27 @@
+{
+  "name": "gtmsystemm",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18.20.0"
+  },
+  "scripts": {
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
+    "trigger:dev": "trigger dev",
+    "trigger:deploy": "trigger deploy",
+    "trigger:login": "trigger login"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.120.0",
+    "@supabase/supabase-js": "^2.112.3",
+    "@trigger.dev/sdk": "4.5.12",
+    "apify-client": "^2.25.0",
+    "openai": "^7.5.0"
+  },
+  "devDependencies": {
+    "@trigger.dev/build": "4.5.12",
+    "trigger.dev": "4.5.12",
+    "tsx": "^4.23.12"
+  }
+}

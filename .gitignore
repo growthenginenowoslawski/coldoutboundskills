@@ -1,5 +1,9 @@
 node_modules/
 dist/
+
+# Trigger.dev
+.trigger/
+
 .env
 .env.local
 .env.*.local
