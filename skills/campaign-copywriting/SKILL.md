@@ -163,7 +163,27 @@ Does this structure work? Confirm to proceed to final copy.
 
 ## Step 4: Output Final Copy
 
-Once all decisions are confirmed, output the complete campaign.
+Once all decisions are confirmed, generate the complete campaign drafts internally — then run the no-ai-slop editing pass on every email variant before you show anything to the user.
+
+### No-AI-Slop Editing Pass (apply to every variant before output)
+
+This is `/no-ai-slop` Edit mode applied automatically. Make the minimum effective edits. Preserve the campaign voice, all `{{variables}}`, word count targets, and hard rules above. Do not add claims or opinions — only cut and compress.
+
+**Cut these words outright:** delve, foster, leverage, utilize, facilitate, empower, streamline, robust, cutting-edge, paradigm shift, game changer, tapestry, realm, beacon, multifaceted, meticulous, intricate, paramount, transformative, elevate, embark, supercharge, harness, ever-evolving.
+
+**Cut these often-empty phrases:** it's worth noting, it's important to note, at the end of the day, when it comes to, at its core, in today's world, in the age of, the reality is, the truth is, in order to, going forward, let's dive in.
+
+**Cut these patterns:**
+- Throat-clearing openers: "Here's the thing," "Let me be clear," "The truth is" — state the point instead.
+- Binary contrasts: "Not X. Y." — just say Y.
+- Importance puffery: "marks a pivotal moment," "plays a vital role," "stands as a testament" — state the fact.
+- Summary-recap endings: any final sentence that restates the email — cut it.
+- Weasel attribution: "experts agree," "studies show" — name the source or cut the claim.
+- Fake-strong verbs: "serves as a centralized hub" → say what it actually does.
+- Interpretive metadiscourse: "That last part matters," "The key point is," "As you can see" — cut them.
+- Em dashes — already banned by the hard rules. Use periods or commas.
+
+After the pass, check the result against the QA Checklist before outputting.
 
 ### Output Format
 

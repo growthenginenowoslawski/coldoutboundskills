@@ -1,5 +1,9 @@
 node_modules/
 dist/
+
+# Trigger.dev
+.trigger/
+
 .env
 .env.local
 .env.*.local
@@ -13,6 +17,9 @@ dist/
 .claude/
 .obsidian/
 .cursor/
+
+# Supabase CLI local metadata
+supabase/.temp/
 
 # Test/audit artifacts from local runs
 /tmp-audit/
