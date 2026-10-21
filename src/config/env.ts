@@ -52,6 +52,7 @@ export const ENV_KEYS = {
   predictleadsApiToken: "PREDICTLEADS_API_TOKEN",
   // Outreach / sending platform providers (Stage 16)
   smartleadApiKey: "SMARTLEAD_API_KEY",
+  instantlyApiKey: "INSTANTLY_API_KEY",
 } as const;
 
 export type EnvKey = (typeof ENV_KEYS)[keyof typeof ENV_KEYS];

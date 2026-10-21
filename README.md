@@ -2,13 +2,13 @@
 
 Open-source [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) for cold email infrastructure, lead sourcing, copywriting, and operations. Built by [GrowthEngineX](https://growthengine-x.com) from patterns across 1,000+ real B2B campaigns.
 
-30 skills that work together. Clone the repo, bring your API keys, point Claude Code at it, go from zero to a running campaign.
+31 skills that work together. Clone the repo, bring your API keys, point Claude Code at it, go from zero to a running campaign.
 
 **New here?** Invoke `/cold-email-kickoff` — it's the guided entry point that orchestrates ICP + lead magnet + strategy + plan in one flow.
 
 ## What's in here
 
-30 skills organized in 5 tracks, plus 19 signal playbooks in Track 6 — each shipping three ways (a Claude skill, a Clay table build, and a Clay CLI workflow).
+31 skills organized in 5 tracks, plus 19 signal playbooks in Track 6 — each shipping three ways (a Claude skill, a Clay table build, and a Clay CLI workflow).
 
 **New to cold email? Start with `/cold-email-kickoff`.** It orchestrates ICP → lead magnet → campaign strategy → plan in one guided flow.
 
@@ -42,6 +42,7 @@ Open-source [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/
 - **`spam-word-checker`** — scan copy for deliverability-killing phrases
 - **`smartlead-spintax`** — add spintax variations to emails
 - **`smartlead-api`** — Smartlead API reference
+- **`instantly-api`** — Instantly API reference (alternative sequencer; unvalidated until tested with a live key)
 - **`smartlead-campaign-upload-public`** — DRAFT-upload leads.csv + variants.yaml to Smartlead (always DRAFT, you hit Start manually)
 
 ### Track 5 — Iterate & Automate

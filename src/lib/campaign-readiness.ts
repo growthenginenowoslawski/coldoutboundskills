@@ -618,7 +618,10 @@ function resolveCredentials(platform: string): boolean {
   if (platform === "smartlead") {
     return Boolean(optionalEnv("SMARTLEAD_API_KEY"));
   }
-  // Other platforms (plusvibe, instantly) — no adapter implemented yet
+  if (platform === "instantly") {
+    return Boolean(optionalEnv("INSTANTLY_API_KEY"));
+  }
+  // plusvibe — no adapter implemented yet
   return false;
 }
 

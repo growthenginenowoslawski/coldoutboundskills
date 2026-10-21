@@ -28,6 +28,7 @@ import {
   OutreachCredentialError,
   OutreachProviderError,
 } from "./errors.js";
+import { InstantlyAdapter } from "./instantly.js";
 import { SmartleadAdapter } from "./smartlead.js";
 import type { OutreachProvider, OutreachProviderId } from "./types.js";
 
@@ -46,14 +47,18 @@ export class OutreachProviderRegistry {
    *
    * Env vars read:
    *   SMARTLEAD_API_KEY — required for the smartlead provider
+   *   INSTANTLY_API_KEY — required for the instantly provider (UNVALIDATED adapter)
    */
   static fromEnv(): OutreachProviderRegistry {
     return new OutreachProviderRegistry((_providerId, _clientId) => {
       // All clients share the same env-level credentials for now.
       // Stage 18+: look up per-client credentials here.
-      const smartleadKey = optionalEnv("SMARTLEAD_API_KEY");
-      if (smartleadKey) return { apiKey: smartleadKey };
-      return undefined;
+      const envName =
+        _providerId === "smartlead" ? "SMARTLEAD_API_KEY"
+        : _providerId === "instantly" ? "INSTANTLY_API_KEY"
+        : undefined;
+      const key = envName ? optionalEnv(envName) : undefined;
+      return key ? { apiKey: key } : undefined;
     });
   }
 
@@ -76,11 +81,12 @@ export class OutreachProviderRegistry {
         return new SmartleadAdapter({ apiKey: creds.apiKey });
       }
 
-      case "instantly":
-        throw new OutreachProviderError(
-          "instantly: adapter not yet implemented (Stage 18+)",
-          "instantly",
-        );
+      case "instantly": {
+        if (!creds?.apiKey) {
+          throw new OutreachCredentialError("instantly");
+        }
+        return new InstantlyAdapter({ apiKey: creds.apiKey });
+      }
 
       case "plusvibe":
         throw new OutreachProviderError(

@@ -68,7 +68,7 @@ Canonical linear flow (see `docs/roadmap.md` for the full stage→skill table an
 
 - The `SKILL.md` `description` field is what makes a skill discoverable/invocable — write it as an explicit "use this when…" so Claude picks the right skill. Keep it aligned with the entries in `README.md` and `docs/roadmap.md`, which double as the human-facing skill index.
 - Skills that spend real money (buying domains, sending) or upload to a platform must confirm with the user first and default to non-destructive (e.g. `smartlead-campaign-upload-public` always uploads as DRAFT; the user hits Start manually). Preserve these safeguards.
-- Reference-only skills (`smartlead-api`, `prospeo-search-api`, `smartlead-spintax`) are documentation surfaces with no scripts — they exist so Claude has the API/format details inline.
+- Reference-only skills (`smartlead-api`, `instantly-api`, `prospeo-search-api`, `smartlead-spintax`) are documentation surfaces with no scripts — they exist so Claude has the API/format details inline.
 
 ## Supabase Documentation Rule
 

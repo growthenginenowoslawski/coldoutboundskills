@@ -336,10 +336,6 @@ test("registry.fromEnv() throws OutreachCredentialError when SMARTLEAD_API_KEY m
 test("registry throws OutreachProviderError for unimplemented providers", () => {
   const registry = OutreachProviderRegistry.fromEnv();
   assert.throws(
-    () => registry.getProvider("instantly", "client-1"),
-    (err: Error) => err instanceof OutreachProviderError,
-  );
-  assert.throws(
     () => registry.getProvider("plusvibe", "client-1"),
     (err: Error) => err instanceof OutreachProviderError,
   );
