@@ -47,7 +47,7 @@ Skills are designed to hand off to each other in a pipeline. The two orchestrato
 - **`/cold-email-starter-kit`** — the alternative long-form 14-step manual tutorial covering the same ground.
 
 Canonical linear flow (see `docs/roadmap.md` for the full stage→skill table and troubleshooting tree):
-`icp-onboarding` → `lead-magnet-brainstorm` → `campaign-strategy` → (infra: `zapmail-domain-setup-public` → `smartlead-inbox-manager`, ~2-week warmup) → a list-building skill → `list-quality-scorecard` → `campaign-copywriting` → `spam-word-checker` → `smartlead-campaign-upload-public` → (21-day wait) → `positive-reply-scoring` → `experiment-design`.
+`icp-onboarding` → `lead-magnet-brainstorm` → `campaign-strategy` → (infra: `zapmail-domain-setup-public` → `smartlead-inbox-manager`, ~2-week warmup) → a list-building skill → `list-quality-scorecard` → `campaign-copywriting` → `spam-word-checker` → `instantly-campaign-prep` (Instantly) or `smartlead-campaign-upload-public` (Smartlead) → (21-day wait) → `positive-reply-scoring` → `experiment-design`.
 
 **Every list-building skill** (`prospeo-full-export`, `disco-like`, `google-maps-list-builder`, `blitz-list-builder`, `competitor-engagers`, `list-builder`, `list-expander`) invokes **`/icp-prompt-builder`** as a required qualification step — a change to how ICP prompts are built ripples across all of them.
 

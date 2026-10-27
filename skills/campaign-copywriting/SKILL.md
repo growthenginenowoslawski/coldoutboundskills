@@ -918,7 +918,9 @@ Now work stepwise with confidence.
 
 **Run `/spam-word-checker`** — it auto-triggers on any cold email draft. Make sure no banned phrases slipped in. Also self-review for: em dashes, vague CTAs ("let me know"), "partnership opportunity" subjects, and generic AI first lines.
 
-Then **run `/smartlead-campaign-upload-public`** — it takes your `variants.yaml` + a leads.csv and creates the campaign in Smartlead in DRAFT mode. You review in the Smartlead UI and hit Start manually.
+Then, depending on your sequencer:
+- **Instantly:** **run `/instantly-campaign-prep`** — it takes your `variants.yaml` + a leads.csv and produces the cleaned import CSV, the sequence text and a launch checklist. You import and press Launch in the Instantly UI.
+- **Smartlead:** **run `/smartlead-campaign-upload-public`** — it creates the campaign in Smartlead in DRAFT mode. You review in the Smartlead UI and hit Start manually.
 
 **Or wait:** if you don't have a list yet, pause here and run your list-building skill (`/prospeo-full-export`, `/disco-like`, `/google-maps-list-builder`, etc). Save the `variants.yaml` — it'll be waiting when you're ready.
 

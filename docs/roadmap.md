@@ -25,7 +25,8 @@ One-page map from business-stage to skill. Find where you are, read the "invoke"
     ↓
 
     ↓
-/smartlead-campaign-upload-public    ← DRAFT only, you hit Start in UI
+/instantly-campaign-prep  (Instantly)  ← files to import; you launch in the UI
+/smartlead-campaign-upload-public (Smartlead) ← DRAFT only, you hit Start in UI
     ↓
 (21-day wait)
     ↓
@@ -56,7 +57,8 @@ Ongoing: /cold-email-weekly-rhythm
 | "I want 'more companies like X'" | `/disco-like` | Lookalike discovery via seed domains. Required: `/icp-prompt-builder`. |
 | "I want leads from LinkedIn engagement" | `/competitor-engagers` | Competitor post commenters/reactors. Required: `/icp-prompt-builder`. |
 | "List is built, grade it" | `/list-quality-scorecard` | 8-dim grade A+ to F + top issues |
-| "Ready to launch (manual)" | `/smartlead-campaign-upload-public` | DRAFT upload, you hit Start in UI |
+| "Ready to launch on Instantly" | `/instantly-campaign-prep` | Cleaned lead CSV + sequence text + launch checklist; you import and launch in the Instantly UI |
+| "Ready to launch on Smartlead" | `/smartlead-campaign-upload-public` | DRAFT upload, you hit Start in UI |
 | "Want it fully automated" | `/auto-research-public` | 8-phase autonomous launcher |
 | "I have replies, how did I do?" | `/positive-reply-scoring` | Positive reply rate (the north star) |
 | "Reply rate dropped, why?" | `/email-deliverability-audit` | SPF/DKIM/DMARC + 1% rule + spam placement |
@@ -75,7 +77,7 @@ Ongoing: /cold-email-weekly-rhythm
 4. `/list-quality-scorecard` — grade the filtered list
 5. `/campaign-copywriting` — write copy for the top campaign from strategy
 6. `/spam-word-checker` — QA (banned words)
-7. `/smartlead-campaign-upload-public` — DRAFT upload, review in Smartlead, hit Start
+7. `/instantly-campaign-prep` (Instantly) or `/smartlead-campaign-upload-public` (Smartlead) — review, then launch it yourself
 8. Put `/cold-email-weekly-rhythm` on your calendar
 9. Campaign runs 21 days
 10. `/positive-reply-scoring` → score the outcome
