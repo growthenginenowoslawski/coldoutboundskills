@@ -1,6 +1,6 @@
 # Cold Outbound Skills
 
-Open-source [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) for cold email infrastructure, lead sourcing, copywriting, and operations. Built by [GrowthEngineX](https://growthengine-x.com) from patterns across 1,000+ real B2B campaigns.
+Open-source [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) for cold email infrastructure, lead sourcing, copywriting, and operations. Built by [GrowthEngineX](https://growthenginex.com) from patterns across 1,000+ real B2B campaigns.
 
 31 skills that work together. Clone the repo, bring your API keys, point Claude Code at it, go from zero to a running campaign.
 
